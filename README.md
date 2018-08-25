@@ -35,6 +35,28 @@ To convert your UD dataset to UniMorph, list the languages you'd like to convert
 python marry.py convert --langs he ro de it no_bokmaal 
 ```
 
+When the input looks like this:
+
+```
+# sent_id = es-train-001-s21
+# text = Tiene 2 madres.
+1	Tiene	tener	VERB	_	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	0	root	_	_
+2	2	2	NUM	_	NumType=Card	3	nummod	_	_
+3	madres	madre	NOUN	_	Gender=Masc|Number=Plur	1	obj	_	SpaceAfter=No
+4	.	.	PUNCT	_	_	1	punct	_	_
+```
+
+The output will look like this:
+
+```
+# sent_id = es-train-001-s21
+# text = Tiene 2 madres.
+1	Tiene	tener	VERB	_	PRS;V;FIN;3;IND;SG	0	root	_	_
+2	2	2	NUM	_	NUM	3	nummod	_	_
+3	madres	madre	NOUN	_	N;PL;MASC	1	obj	_	SpaceAfter=No
+4	.	.	PUNCT	_	_	1	punct	_	_
+```
+
 #### Evaluation
 
 To assess a conversion (either of the included `Translator` objects or your own), the syntax is similar:
