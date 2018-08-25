@@ -15,6 +15,8 @@ As each corpus is built by different annotators, **language-specific decisions h
 
 ### Usage
 
+The driver of the entire endeavor is the file `marry.py`, which marries a UD dataset to its affiliated UniMorph.
+
 First, update the paths in `paths.py` to reflect where your UD (and UniMorph, if evaluating) data are stored.
 
 #### Conversion
