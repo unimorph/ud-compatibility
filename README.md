@@ -17,8 +17,6 @@ As each corpus is built by different annotators, **language-specific decisions h
 
 The driver of the entire endeavor is the file `marry.py`, which marries a UD dataset to its affiliated UniMorph.
 
-First, update the paths in `paths.py` to reflect where your UD (and UniMorph, if evaluating) data are stored.
-
 #### Conversion
 
 To convert *one* file to UniMorph, give the path (and optionally the specific language converter you'd like to use).
@@ -34,6 +32,8 @@ To convert your UD dataset to UniMorph, list the languages you'd like to convert
 ```bash
 python marry.py convert --langs he ro de it no_bokmaal 
 ```
+
+(You'll need to update the paths in `paths.py` to reflect where your UD (and UniMorph, if evaluating) data are stored.)
 
 When the input looks like this:
 
@@ -64,6 +64,9 @@ To assess a conversion (either of the included `Translator` objects or your own)
 ```bash
 python marry.py evaluate --langs he ro de it no_bokmaal 
 ```
+
+(You'll need to update the paths in `paths.py` to reflect where your UD (and UniMorph, if evaluating) data are stored.)
+
 
 #### Replication
 
