@@ -95,12 +95,18 @@ This project is licensed under the GNU GPL v3 license; see the [LICENSE.md](LICE
 ## Citation
 
 ```
-@inproceedings{mccarthy2018udw,
-	title = {Marrying {U}niversal {D}ependencies and {U}niversal {M}orphology},
-	author = {Arya D. McCarthy and Miikka Silfverberg and Ryan Cotterell and Mans Hulden and David Yarowsky},
-	booktitle = {Proceedings of the EMNLP 2018 Workshop on Universal Dependencies (UDW 2018)},
-	address = {Brussels, Belgium}
-	month = {October}
-	year = {2018}
+@InProceedings{mccarthy2018udw,
+  author = 	"McCarthy, Arya D.
+		and Silfverberg, Miikka
+		and Cotterell, Ryan
+		and Hulden, Mans
+		and Yarowsky, David",
+  title = 	"Marrying {U}niversal {D}ependencies and {U}niversal {M}orphology",
+  booktitle = 	"Proceedings of the Second Workshop on Universal Dependencies (UDW 2018)",
+  year = 	"2018",
+  publisher = 	"Association for Computational Linguistics",
+  pages = 	"91--101",
+  location = 	"Brussels, Belgium",
+  url = 	"http://aclweb.org/anthology/W18-6011"
 }
 ```
