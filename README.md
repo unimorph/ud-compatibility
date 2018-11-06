@@ -96,7 +96,7 @@ This project is licensed under the GNU GPL v3 license; see the [LICENSE.md](LICE
 
 ```
 @inproceedings{mccarthy2018udw,
-	title = {Marrying Universal Dependencies and Universal Morphology},
+	title = {Marrying {U}niversal {D}ependencies and {U}niversal {M}orphology},
 	author = {Arya D. McCarthy and Miikka Silfverberg and Ryan Cotterell and Mans Hulden and David Yarowsky},
 	booktitle = {Proceedings of the EMNLP 2018 Workshop on Universal Dependencies (UDW 2018)},
 	address = {Brussels, Belgium}
