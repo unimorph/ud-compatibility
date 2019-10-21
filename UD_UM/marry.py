@@ -122,7 +122,7 @@ def parse_args() -> Namespace:
         help='evaluate a Translator class')
     evaluate.add_argument(
         '-b', "--basic",
-        action='store_false',
+        action='store_true',
         help="dumb conversion?"
         )
     evaluate.add_argument(
@@ -142,7 +142,7 @@ def parse_args() -> Namespace:
         help='convert UD files to UniMorph')
     convert.add_argument(
         '-b', "--basic",
-        action='store_false',
+        action='store_true',
         help="dumb conversion?"
         )
     convert.add_argument(
