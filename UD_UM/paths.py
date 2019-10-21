@@ -11,11 +11,11 @@ UD_FOLDER = _ROOT / "UD"
 UD2UM_FILE = Path(".") / "UD-UniMorph.tsv"
 
 
-class FileGetter():
+class FileGetter:
     @staticmethod
     def get(language: LanguageCoding, convert=False) -> Tuple[Path, List[Path]]:
         um_file = UM_FOLDER / f"{language.um}-master" / f"{language.um}"
-        lang_folder = (UD_FOLDER / f"UD_{language.name}-master")
+        lang_folder = UD_FOLDER / f"UD_{language.name}-master"
         print(lang_folder)
         ud_files = list(lang_folder.glob(f"{language.ud}-ud-*.conllu"))
         FileGetter._check_inputs(um_file, ud_files, convert)

@@ -28,15 +28,17 @@ class UdTag(Set):
 
 
 def ud_iterator(file: Path) -> Iterable[str]:
-    with open(file, encoding='utf-8') as f:
+    with open(file, encoding="utf-8") as f:
         yield from (line.strip() for line in f)
 
 
-class CoNLLRow(namedtuple("CoNLLRow",
-                          "id form lemma upostag xpostag "
-                          "feats head deprel deps misc")):
+class CoNLLRow(
+    namedtuple(
+        "CoNLLRow", "id form lemma upostag xpostag " "feats head deprel deps misc"
+    )
+):
     @classmethod
-    def make(cls, string: str) -> 'CoNLLRow':
+    def make(cls, string: str) -> "CoNLLRow":
         return cls._make(string.split("\t"))
 
 
@@ -50,7 +52,7 @@ def is_conll_useless(line: str) -> bool:
 
 def _ud2um_mapping() -> Dict[UdFeat, UmFeat]:
     ud2um = {}
-    with open(UD2UM_FILE, encoding='utf-8') as f:
+    with open(UD2UM_FILE, encoding="utf-8") as f:
         reader = csv.DictReader(f, delimiter="\t")
         for row in reader:
             ud = UdFeat(row["UD"])

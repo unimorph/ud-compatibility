@@ -44,10 +44,11 @@ def handle_arguments(ud: UdTag) -> List[UmFeat]:
             assert "Person" not in str(parts)
             person = ""
         return f"ARG{kind}{person}{number}"
+
     arg_parts = [p for p in ud if "[" in p and "[psor]" not in p]
     if not arg_parts:
         return [EMPTY_FEAT]
-    arg_re = re.compile(r'\[(.*?)\]')
+    arg_re = re.compile(r"\[(.*?)\]")
     tags = {arg_re.search(p).group(1) for p in arg_parts}
     contributions = []
     for tag in tags:
@@ -101,10 +102,10 @@ def process_tag(part):
         # print("Couldn't find", part)
         return "_"
     #     if part != "_":
-            # if part in UD_valid_tags:
-            #     self.no_match_tags.add(part)
-            # else:
-            #     self.invalid_tags.add(part)
+    # if part in UD_valid_tags:
+    #     self.no_match_tags.add(part)
+    # else:
+    #     self.invalid_tags.add(part)
     else:
         return um_part
 
@@ -117,7 +118,7 @@ def ud2um(ud_tag: UdTag) -> UmTag:
     um_tag.extend(arguments)
 
     for part in ud_tag:
-        if ',' not in part:
+        if "," not in part:
             tag = process_tag(part)
             um_tag.append(tag)
         else:
@@ -127,14 +128,14 @@ def ud2um(ud_tag: UdTag) -> UmTag:
             for val in vals:
                 tag = process_tag(f"{key}={val}")
                 all_parts.append(tag)
-            all_parts = [p for p in all_parts if p != '_']
+            all_parts = [p for p in all_parts if p != "_"]
             um_tag.append(f"{{{'/'.join(all_parts)}}}" if all_parts else "_")
     um_tag = [f for f in um_tag if str(f) != "_"] or [EMPTY_FEAT]
     # print(um_tag)
     return UmTag(";".join(um_tag))
 
 
-class Translator():
+class Translator:
     def __init__(self, clever, replace_feats):
         self.clever = clever
         self.replace_feats = replace_feats
@@ -344,7 +345,13 @@ class FrenchTranslator(Translator):
 
 class GermanTranslator(Translator):
     def lgspec_assert(self, cols, tags):
-        assert "V" in tags or "N" in tags or "V.PTCP" in tags or "V.CVB" in tags or "V.MSDR" in tags
+        assert (
+            "V" in tags
+            or "N" in tags
+            or "V.PTCP" in tags
+            or "V.CVB" in tags
+            or "V.MSDR" in tags
+        )
         # assert tags != {"N"}
         # assert tags != {"V"}
 
@@ -357,6 +364,8 @@ class GermanTranslator(Translator):
         if tags == {"V", "V.PTCP"}:
             tags = {"PST", "V.PTCP"}
         return ";".join(tags)
+
+
 # translators[get_lang("German")] = GermanTranslator
 
 
@@ -523,7 +532,9 @@ class PortugueseTranslator(Translator):
                 tags.add("PST")
             if "PRS" not in tags:
                 tags.add("PST")
-            if (cols.form.endswith("do") or cols.form.endswith("to")) and tags == set("PST;V.PTCP".split(";")):
+            if (cols.form.endswith("do") or cols.form.endswith("to")) and tags == set(
+                "PST;V.PTCP".split(";")
+            ):
                 tags.add("MASC")
                 tags.add("SG")
         if tags == {"V", "V.MSDR"}:
@@ -597,6 +608,8 @@ class SpanishTranslator(Translator):
             if cols.form[-2:] == "ra" or cols.form[-3:] == "ran":
                 tags.add("LGSPEC1")
         return ";".join(tags)
+
+
 # translators[get_lang("Spanish")] = SpanishTranslator
 
 
@@ -671,7 +684,7 @@ class UkrainianTranslator(Translator):
 class UrduTranslator(Translator):
     def lgspec_assert(self, cols, tags):
         # assert "PART" not in tags
-        assert 'ADJ' not in tags
+        assert "ADJ" not in tags
 
     def lgspec_modify(self, cols, um):
         tags = set(um.split(";"))
@@ -687,7 +700,8 @@ translators = dict()
 for language in languages:
     name = language.name
     try:
-        translators[language] = getattr(__import__(__name__),
-                                        "".join(name.replace("-", "_")) + "Translator")
+        translators[language] = getattr(
+            __import__(__name__), "".join(name.replace("-", "_")) + "Translator"
+        )
     except (NameError, AttributeError):
         pass
