@@ -49,7 +49,7 @@ def handle_arguments(ud: UdTag) -> List[UmFeat]:
     if not arg_parts:
         return [EMPTY_FEAT]
     arg_re = re.compile(r"\[(.*?)\]")
-    tags = {arg_re.search(p).group(1) for p in arg_parts}
+    tags = {arg_re.search(p).group(1) for p in arg_parts}  # type: ignore
     contributions = []
     for tag in tags:
         arg = handle_argument([p for p in arg_parts if tag in p])
@@ -64,7 +64,7 @@ def handle_possession(ud_tag: UdTag) -> UmFeat:
         return EMPTY_FEAT
 
     if "None" in str(psor_parts):
-        return "PSSD"
+        return UmFeat("PSSD")
 
     try:
         assert len(psor_parts) <= 2
@@ -95,12 +95,12 @@ def handle_possession(ud_tag: UdTag) -> UmFeat:
     return UmFeat(f"PSS{person}{number}")
 
 
-def process_tag(part):
+def process_tag(part: UdFeat) -> UmFeat:
     try:
         um_part = ud2um_mapping[part]
     except KeyError:
         # print("Couldn't find", part)
-        return "_"
+        return EMPTY_FEAT
     #     if part != "_":
     # if part in UD_valid_tags:
     #     self.no_match_tags.add(part)
@@ -126,17 +126,19 @@ def ud2um(ud_tag: UdTag) -> UmTag:
             vals = vals.split(",")
             all_parts = []
             for val in vals:
-                tag = process_tag(f"{key}={val}")
+                tag = process_tag(UdFeat(f"{key}={val}"))
                 all_parts.append(tag)
             all_parts = [p for p in all_parts if p != "_"]
-            um_tag.append(f"{{{'/'.join(all_parts)}}}" if all_parts else "_")
+            um_tag.append(
+                UmFeat(f"{{{'/'.join(all_parts)}}}") if all_parts else EMPTY_FEAT
+            )
     um_tag = [f for f in um_tag if str(f) != "_"] or [EMPTY_FEAT]
     # print(um_tag)
     return UmTag(";".join(um_tag))
 
 
 class Translator:
-    def __init__(self, clever, replace_feats):
+    def __init__(self, clever, replace_feats) -> None:
         self.clever = clever
         self.replace_feats = replace_feats
 
@@ -166,15 +168,15 @@ class Translator:
 
 
 class BasqueTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "V" in tags or "V.PTCP" in tags or "V.CVB" in tags or "V.MSDR" in tags
 
 
 class BulgarianTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "N" not in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "V" in tags:
             tags.discard("FIN")
@@ -194,14 +196,14 @@ class BulgarianTranslator(Translator):
         if "RL" in tags:
             tags.remove("RL")
             tags.add("SPRL")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class CatalanTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "V" in tags or "V.PTCP" in tags or "V.CVB" in tags or "V.MSDR" in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         # if "N" in tags:
         #     for gender in {"MASC", "FEM", "NEUT", "{MASC/NEUT}"}:
@@ -225,11 +227,11 @@ class CatalanTranslator(Translator):
             tags = set("PRS;V.PTCP".split(";"))
         if {"IPFV", "SBJV"} < tags:
             tags.remove("IPFV")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class CzechTranslator(Translator):
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "ADJ" in tags:
             tags.discard("POS")
@@ -244,30 +246,30 @@ class CzechTranslator(Translator):
             tags.discard("ACT")
             tags.discard("FIN")
             tags.discard("POS")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class DanishTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "ADJ" not in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "V" in tags:
             tags.discard("FIN")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class DutchTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "N" not in tags
 
 
 class EnglishTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "V" in tags or "V.PTCP" in tags or "V.CVB" in tags or "V.MSDR" in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         tags.discard("FIN")
         tags.discard("IND")
@@ -277,21 +279,21 @@ class EnglishTranslator(Translator):
             tags = {"PRS", "V", "V.PTCP"}
         if "V" in tags:
             tags.discard("PASS")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class EstonianTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "ADJ" not in tags
 
 
 class FinnishTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert tags != set("ADJ;GEN;SG".split(";"))
         assert tags != set("ADJ;GEN;PL".split(";"))
         assert "0" not in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "V" in tags:
             if "FIN" in tags:
@@ -307,14 +309,14 @@ class FinnishTranslator(Translator):
         if tags == set("ACT;NFIN;SG;V".split(";")):
             tags.remove("ACT")
             tags.remove("SG")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class FrenchTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "V" in tags or "V.PTCP" in tags or "V.CVB" in tags or "V.MSDR" in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         # if "N" in tags:
         #     for gender in {"MASC", "FEM", "NEUT", "{MASC/NEUT}"}:
@@ -340,11 +342,11 @@ class FrenchTranslator(Translator):
             tags = {"PST", "V.PTCP"}
         if tags == set("V;V.MSDR".split(";")):
             tags = set("PRS;V.CVB".split(";"))
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class GermanTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert (
             "V" in tags
             or "N" in tags
@@ -355,7 +357,7 @@ class GermanTranslator(Translator):
         # assert tags != {"N"}
         # assert tags != {"V"}
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         for gender in {"MASC", "FEM", "NEUT", "{MASC/NEUT}"}:
             if gender in tags:
@@ -363,17 +365,17 @@ class GermanTranslator(Translator):
         tags.discard("FIN")
         if tags == {"V", "V.PTCP"}:
             tags = {"PST", "V.PTCP"}
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 # translators[get_lang("German")] = GermanTranslator
 
 
 class HebrewTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "ADJ" not in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         for gender in {"MASC", "FEM", "NEUT", "{FEM/MASC}"}:
             if gender in tags:
@@ -388,14 +390,14 @@ class HebrewTranslator(Translator):
                 if "SG" in tags or "PL" in tags:
                     tags.add("NDEF")
 
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class HungarianTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "ADJ" not in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         tags.discard("FIN")
         tags.discard("ACT")
@@ -410,11 +412,11 @@ class HungarianTranslator(Translator):
         # if "IN+ALL" in tags:
         #     tags.discard("IN+ALL")
         #     tags.add("ON+ALL")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class ItalianTranslator(Translator):
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         # if "N" in tags:
         #     for gender in {"MASC", "FEM", "NEUT", "{MASC/NEUT}"}:
@@ -437,11 +439,11 @@ class ItalianTranslator(Translator):
             tags = {"PST", "V.PTCP"}
         if tags == set("V;V.MSDR".split(";")):
             tags = set("PRS;V.CVB".split(";"))
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class LatinTranslator(Translator):
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "N" in tags:
             for gender in {"MASC", "FEM", "NEUT", "{MASC/NEUT}"}:
@@ -449,17 +451,17 @@ class LatinTranslator(Translator):
         if "V" in tags:
             tags.discard("ACT")
             tags.discard("FIN")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class LatvianTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert tags != set("3;IND;PRS;V".split(";"))
         assert tags != set("3;IND;PST;V".split(";"))
         assert tags != set("3;IND;FUT;V".split(";"))
         assert "ESS" not in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "V" in tags:
             tags.discard("FH")
@@ -473,27 +475,27 @@ class LatvianTranslator(Translator):
                 tags.discard(gender)
         if tags == set("COND;V".split(";")):
             tags.add("PRS")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class Norwegian_BokmaalTranslator(Translator):
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         tags.discard("IND")
         tags.discard("FIN")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class Norwegian_NynorskTranslator(Translator):
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         tags.discard("IND")
         tags.discard("FIN")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class PolishTranslator(Translator):
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "N" in tags:
             for gender in {"MASC", "FEM", "NEUT"}:
@@ -516,14 +518,14 @@ class PolishTranslator(Translator):
             tags.discard("FIN")
             tags.discard("IND")
             tags.discard("IPFV")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class PortugueseTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "V" in tags or "V.PTCP" in tags or "V.CVB" in tags or "V.MSDR" in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "V.PTCP" in tags:
             tags.discard("V")
@@ -553,11 +555,11 @@ class PortugueseTranslator(Translator):
                 tags.add("PST")
                 tags.add("PRF")
                 tags.remove("PST+PRF")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class RomanianTranslator(Translator):
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "V" in tags:
             tags.discard("FIN")
@@ -569,24 +571,24 @@ class RomanianTranslator(Translator):
                 tags.discard(gender)
         if {"V", "PST", "IND"} < tags:
             tags.add("PFV")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class SlovenianTranslator(Translator):
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "N" in tags:
             for gender in {"MASC", "FEM", "NEUT", "{MASC/NEUT}"}:
                 tags.discard(gender)
             tags.discard("ANIM")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class SpanishTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         assert "V" in tags or "V.PTCP" in tags or "V.CVB" in tags or "V.MSDR" in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         tags.discard("FIN")
         if "AUX" in tags:
@@ -607,18 +609,18 @@ class SpanishTranslator(Translator):
             tags.add("PST")
             if cols.form[-2:] == "ra" or cols.form[-3:] == "ran":
                 tags.add("LGSPEC1")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 # translators[get_lang("Spanish")] = SpanishTranslator
 
 
 class SwedishTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         # assert "CMPR" not in tags
         pass
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         tags.discard("FIN")
         if "ADJ" in tags:
@@ -642,26 +644,26 @@ class SwedishTranslator(Translator):
             tags.add("ACT")
         if {"ACT", "IMP", "V"} == tags:
             tags.remove("ACT")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class TurkishTranslator(Translator):
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "N" in tags:
             tags.discard("3")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
     # def lgspec_assert(self, cols, tags):
     #     assert "ESS" not in tags
 
 
 class UkrainianTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         # assert "DET" not in tags
         pass
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         if "N" in tags:
             for gender in {"MASC", "FEM", "NEUT", "{MASC/NEUT}"}:
@@ -678,22 +680,22 @@ class UkrainianTranslator(Translator):
                 tags.discard(tag)
         if "V.CVB" in tags:
             tags.discard("V")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 class UrduTranslator(Translator):
-    def lgspec_assert(self, cols, tags):
+    def lgspec_assert(self, cols: CoNLLRow, tags: Set[str]) -> None:
         # assert "PART" not in tags
         assert "ADJ" not in tags
 
-    def lgspec_modify(self, cols, um):
+    def lgspec_modify(self, cols: CoNLLRow, um: UmTag) -> UmTag:
         tags = set(um.split(";"))
         for gender in {"MASC", "FEM", "NEUT", "{MASC/NEUT}"}:
             if gender in tags:
                 tags.remove(gender)
         if {"N", "SG"} <= tags or {"N", "PL"} <= tags or "PROPN" in tags:
             tags.discard("3")
-        return ";".join(tags)
+        return UmTag(";".join(tags))
 
 
 translators = dict()

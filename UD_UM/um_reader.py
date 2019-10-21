@@ -3,7 +3,10 @@ from pathlib import Path
 from typing import Iterable, Tuple, Set, Dict
 
 
-def _read_unimorph(fname: Path) -> Iterable[Tuple[str, str, Set[str]]]:
+from utils import Form, Lemma, UmFeat, UmFeats, UniMorphTriple
+
+
+def _read_unimorph(fname: Path) -> Iterable[UniMorphTriple]:
     with open(fname, encoding="utf-8") as f:
         for line in f:
             if line.split():
@@ -12,17 +15,20 @@ def _read_unimorph(fname: Path) -> Iterable[Tuple[str, str, Set[str]]]:
                 except ValueError:
                     print("Line:", line.split())
                     raise
-                yield (inflected, lemma, set(features.split(";")))
+                features_typed = map(UmFeat, features.split(";"))
+                yield UniMorphTriple(Form(inflected), Lemma(lemma), set(features_typed))
 
 
-def _as_dict_of_sets(rows: Iterable[Tuple[str, str, Set[str]]]) -> Tuple[dict, dict]:
-    tags = defaultdict(set)
-    lemmas = defaultdict(set)
+def _as_dict_of_sets(
+    rows: Iterable[UniMorphTriple]
+) -> Tuple[Dict[Form, Set[UmFeats]], Dict[Form, Set[Lemma]]]:
+    tags: Dict[Form, Set[UmFeats]] = defaultdict(set)
+    lemmas: Dict[Form, Set[Lemma]] = defaultdict(set)
     for form, lemma, tag in rows:
         tags[form].add(frozenset(tag))
         lemmas[form].add(lemma)
     return dict(tags), dict(lemmas)
 
 
-def unimorph(fname: Path) -> Tuple[dict, dict]:
+def unimorph(fname: Path) -> Tuple[Dict[Form, Set[UmFeats]], Dict[Form, Set[Lemma]]]:
     return _as_dict_of_sets(_read_unimorph(fname))

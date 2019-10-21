@@ -4,7 +4,7 @@ Convert Universal Dependencies morphology annotations to UniMorph.
 
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Optional, Tuple, Union
 
 from termcolor import cprint
 
@@ -33,12 +33,14 @@ class EvaluationInstance:
         if not replace_feats:
             self.tags, self.lemmas = unimorph(self.um_file)
 
-    def translate(self, source: str, output_all=False) -> CoNLLRow:
+    def translate(
+        self, source: str, output_all=False
+    ) -> Optional[Union[CoNLLRow, str]]:
         if is_conll_useless(source):
             if output_all:
                 return source
             else:
-                return
+                return None
         record = CoNLLRow.make(source)
         updated = self.translator.translate(record)
         if output_all:
@@ -108,8 +110,12 @@ class EvaluationInstance:
 
     def _evaluate(self, file: Path) -> Tuple[int, int]:
         lines: Iterable[str] = ud_iterator(file)
-        translations = [self.translate(line) for line in lines]
-        translations = [t for t in translations if t is not None]
+        maybe_translations: List[Optional[Union[CoNLLRow, str]]] = [
+            self.translate(line) for line in lines
+        ]
+        translations: List[CoNLLRow] = [
+            t for t in maybe_translations if isinstance(t, CoNLLRow)
+        ]
         recall = self.recall(translations)
         return recall
 
@@ -117,7 +123,7 @@ class EvaluationInstance:
 class FileConverter(EvaluationInstance):
     """docstring for FileConverter"""
 
-    def __init__(self, file: Path, language: LanguageCoding, clever: bool):
+    def __init__(self, file: Path, language: LanguageCoding, clever: bool) -> None:
         super(FileConverter, self).__init__(language, clever, replace_feats=True)
         self.ud_files = [file]
 
@@ -163,7 +169,7 @@ def parse_args() -> Namespace:
     return parser.parse_args()
 
 
-def replicate():
+def replicate() -> None:
     for language in languages:
         cprint(language.name, attrs={"bold"})
         for clever in [False, True]:
@@ -172,7 +178,7 @@ def replicate():
             instance.evaluate()
 
 
-def evaluate(args: Namespace):
+def evaluate(args: Namespace) -> None:
     for language_ in args.langs:
         language = get_lang(language_)
         cprint(language.name, attrs={"bold"})
@@ -184,7 +190,7 @@ def evaluate(args: Namespace):
         instance.evaluate()
 
 
-def convert(args: Namespace):
+def convert(args: Namespace) -> None:
     for language_ in args.langs:
         language = get_lang(language_)
         cprint(language.name, attrs={"bold"})
@@ -196,7 +202,7 @@ def convert(args: Namespace):
         instance.convert()
 
 
-def convert_file(args: Namespace):
+def convert_file(args: Namespace) -> None:
     assert not args.langs or len(args.langs) == 1
     if args.langs:
         try:
@@ -215,7 +221,7 @@ def convert_file(args: Namespace):
     instance.convert()
 
 
-def main():
+def main() -> None:
     args = parse_args()
     print(args)
     if args.command == "replicate":

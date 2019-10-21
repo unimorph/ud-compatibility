@@ -1,16 +1,23 @@
 import csv
-from collections import namedtuple
 from pathlib import Path
-from typing import Dict, Iterable, NewType
+from typing import Dict, FrozenSet, Iterable, NamedTuple, NewType
 from collections.abc import Set
 
 from paths import UD2UM_FILE
 
 
-# UdTag = NewType("UdTag", str)
+Form = NewType("Form", str)
+Lemma = NewType("Lemma", str)
 UmTag = NewType("UmTag", str)
 UdFeat = NewType("UdFeat", str)
 UmFeat = NewType("UmFeat", str)
+UmFeats = FrozenSet[UmFeat]
+
+
+class UniMorphTriple(NamedTuple):
+    form: Form
+    lemma: Lemma
+    feats: Set[UmFeat]
 
 
 class UdTag(Set):
@@ -32,11 +39,18 @@ def ud_iterator(file: Path) -> Iterable[str]:
         yield from (line.strip() for line in f)
 
 
-class CoNLLRow(
-    namedtuple(
-        "CoNLLRow", "id form lemma upostag xpostag " "feats head deprel deps misc"
-    )
-):
+class CoNLLRow(NamedTuple):
+    id: str
+    form: Form
+    lemma: Lemma
+    upostag: str
+    xpostag: str
+    feats: str
+    head: str
+    deprel: str
+    deps: str
+    misc: str
+
     @classmethod
     def make(cls, string: str) -> "CoNLLRow":
         return cls._make(string.split("\t"))

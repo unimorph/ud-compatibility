@@ -22,7 +22,7 @@ class FileGetter:
         return um_file, ud_files
 
     @staticmethod
-    def _check_inputs(um_file: Path, ud_files: List[Path], skip_um) -> None:
+    def _check_inputs(um_file: Path, ud_files: List[Path], skip_um: bool) -> None:
         if not skip_um:
             FileGetter._validate_file(um_file)
         if not ud_files:
