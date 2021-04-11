@@ -68,7 +68,7 @@ class EvaluationInstance:
             print(file)
             lines: Iterable[str] = ud_iterator(file)
             translations = [self.translate(line, output_all=True) for line in lines]
-            with open(output_filepath(file), "w") as f:
+            with open(output_filepath(file), "w", encoding="utf-8") as f:
                 for line in translations:
                     print(line, file=f)
 
