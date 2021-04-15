@@ -42,7 +42,7 @@ Case=Cau		Yes
 Case=Ben	BEN		
 Case=Cmp	COMPV		
 Case=Equ	EQTV		
-Case=Ins	INS		
+Case=Ins	INST		
 Case=Ade	AT+ESS
 Definite=Ind	INDF		
 Definite=Spec	SPEC		
@@ -53,7 +53,7 @@ Degree=Abs	AB
 Degree=Cmp	CMPR		@hajime Unimorph COMPV is UD Case=Cmp
 Degree=Equ	EQT		@hajime Unimorph EQTV is UD Case=Equ
 Degree=Pos		Yes	@hajime UD positive is a kind of "base" values; no counterpart in the UniMorph comparison dimension
-Degree=Sup	RL		@hajime UD superlative requires comparison ("The quality of one object is compared to the same quality of all other objects within a set."), so its counterpart in UniMorph is RL  (rather than RL+AB)
+Degree=Sup	SPRL		@hajime UD superlative requires comparison ("The quality of one object is compared to the same quality of all other objects within a set."), so its counterpart in UniMorph is SPRL  (rather than SPRL+AB)
 Mood=Ind	IND		
 Mood=Imp	IMP		
 Mood=Cnd	COND		
