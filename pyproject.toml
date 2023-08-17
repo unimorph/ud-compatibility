@@ -1,0 +1,17 @@
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.8.0,<4"]
+
+[project]
+name = "udm-marry"
+version = "1.0.0"
+authors = [
+    {name = "Arya McCarthy", email = "placeholder@gmail.com"},
+]
+description = "Python package developer's cheat sheet (using pyproject.toml)."
+readme = "README.md"
+license = "GNU GPL v3"
+requires-python = ">=3.5"
+dependencies = [
+    "termcolor == 2.3.0",
+]
