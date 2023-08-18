@@ -1,0 +1,20 @@
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.8.0,<4"]
+
+[project]
+name = "ud-compatibility"
+version = "0.1.0"
+authors = [
+    {name = "Arya McCarthy", email = "arya@jhu.edu"},
+]
+maintainers = [
+    {name = "Daniel Yakubov", email = "daniel.yakubov23@gmail.com"}
+]
+description = "Converts conllu files with features that use the Universal Dependency (UD) annotation schema to features that use the Universal Morphology (UM) schema."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.5"
+dependencies = [
+    "termcolor == 2.3.0",
+]
