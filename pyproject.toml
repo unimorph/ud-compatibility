@@ -6,7 +6,7 @@ requires = ["flit_core >=3.8.0,<4"]
 name = "ud-um"
 version = "0.1.0"
 authors = [
-    {name = "Arya McCarthy", email = "placeholder@gmail.com"},
+    {name = "Arya McCarthy", email = "arya@jhu.edu"},
 ]
 description = "Converts conllu files with features that use the Universal Dependency (UD) annotation schema to features that use the Universal Morphology (UM) schema."
 readme = "README.md"
