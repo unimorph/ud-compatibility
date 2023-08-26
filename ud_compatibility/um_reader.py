@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Iterable, Tuple, Set, Dict
 
 
-from utils import Form, Lemma, UmFeat, UmFeats, UniMorphTriple
+from .utils import Form, Lemma, UmFeat, UmFeats, UniMorphTriple
 
 
 def _read_unimorph(fname: Path) -> Iterable[UniMorphTriple]:

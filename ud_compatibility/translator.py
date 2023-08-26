@@ -2,8 +2,8 @@ import re
 from collections import defaultdict
 from typing import List, Set
 
-from languages import languages
-from utils import CoNLLRow, UdFeat, UdTag, UmFeat, UmTag, ud2um_mapping
+from .languages import languages
+from .utils import CoNLLRow, UdFeat, UdTag, UmFeat, UmTag, ud2um_mapping
 
 EMPTY_FEAT = UmFeat("_")
 

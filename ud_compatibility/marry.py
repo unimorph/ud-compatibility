@@ -8,11 +8,11 @@ from typing import Iterable, List, Optional, Tuple, Union
 
 from termcolor import cprint
 
-from languages import languages, LanguageCoding, get_lang
-from paths import FileGetter, output_filepath
-from translator import Translator, translators
-from um_reader import unimorph
-from utils import CoNLLRow, is_conll_useless, ud_iterator
+from .languages import languages, LanguageCoding, get_lang
+from .paths import FileGetter, output_filepath
+from .translator import Translator, translators
+from .um_reader import unimorph
+from .utils import CoNLLRow, is_conll_useless, ud_iterator
 
 
 class EvaluationInstance:
