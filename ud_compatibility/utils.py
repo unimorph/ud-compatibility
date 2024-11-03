@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, FrozenSet, Iterable, NamedTuple, NewType
 from collections.abc import Set
 
-from paths import UD2UM_FILE
+from .paths import UD2UM_FILE
 
 
 Form = NewType("Form", str)

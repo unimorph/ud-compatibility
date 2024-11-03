@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List, Tuple
 
-from languages import LanguageCoding
+from .languages import LanguageCoding
 
 # These must be pathlib Path objects.
 # Easy way: Path('whatever/my/path/is')
